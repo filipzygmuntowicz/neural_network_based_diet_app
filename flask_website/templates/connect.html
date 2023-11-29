@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='connect.css') }}">
+    <title>Connect</title>
+</head>
+{% include "header.html" %}
+<body onload="load()">
+    <div class="main-container">
+        <img src="" alt="Image is loading...">
+        <div>
+            <b>Scan the QR code with your app to connect.</b>
+        </div>
+    </div>
+    
+<script>
+async function getQR() {
+    let api_url = APP_URL + "/api/qr"
+    const response = await fetch(api_url, {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`}
+    });
+    let data = await response.blob()
+    let url = URL.createObjectURL(data)
+    let qr = document.getElementsByTagName('img')[0]
+    qr.src = url
+    }
+    getQR()
+</script>
+</body>
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='add.css') }}">
+    <title>Add</title>
+</head>
+{% include "header.html" %}
+<body onload="load()">
+    <main>
+        <div class="main-container" >
+            <div class="image-container">
+                <img src="https://apixelyear.foxjs.dev/api/avatar/3b49fb7d-3c15-4280-acb9-c0f270496fb3" class="image" alt="Image is loading...">
+            </div>
+            <table>
+            </table>
+            <div>
+                <button class="add" onClick="addButton()">Add</button>
+                <button class="cancel" onClick ="cancelButton()">Cancel</button>
+            </div>
+        </div>
+    </main>
+<script>
+    let w = window.innerWidth;
+    let h = window.innerHeight;
+    let weightToNutrition
+    async function getProductsImage() {
+        let api_url = APP_URL + "/api/products_image"
+        const response = await fetch(api_url, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`}
+        });
+        let data = await response.blob()
+        let url = URL.createObjectURL(data)
+        let productsImage = document.getElementsByTagName('img')[0]
+        productsImage.src = url
+    }
+    async function getNutrition(foods_data) {
+        let api_url = APP_URL + "/api/nutrition"
+        const response = await fetch(api_url, {
+        method: "POST",
+        body: JSON.stringify(foods_data),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8"
+          }
+        });
+        data = await response.json()
+        weightToNutrition= data["weightToNutrition"]
+        let nutrition = data["nutrition"]
+        return nutrition
+    }
+    async function load() {
+        const url = new URL(window.location.href);
+        const searchParams = url.searchParams;
+        let q = searchParams.get('q');
+        let queryToken = searchParams.get('token');
+        if (queryToken) {
+            localStorage.setItem("token", queryToken)
+        }
+        getProductsImage()
+        if (w > h) {
+            thead = document.createElement("thead")
+            tr = document.createElement("tr")
+            tr.innerHTML = `
+                <th class="th-desktop">Food Item</th>
+                <th class="th-desktop">Weight (in grams)</th>
+                <th class="th-desktop">Calories</th>
+                <th class="th-desktop">Carbohydrates</th>
+                <th class="th-desktop">Fats</th>
+                <th class="th-desktop">Proteins</th>
+                <th class="th-desktop"></th>`
+            thead.appendChild(tr)
+            let table = document.getElementsByTagName("table")[0]
+            table.appendChild(thead)
+            tbody = document.createElement("tbody")
+            try {
+                let foods_data = JSON.parse(atob(q))
+                foods_data = await getNutrition(foods_data)
+                document.querySelector(".add").style.display = "block"
+                document.querySelector(".cancel").style.display = "block"
+                foods_data.forEach((dict) => {
+                    tr = document.createElement("tr")
+                    tr.innerHTML = `
+                        <td class="td-desktop food-name"><b>${dict["name"]}</b></td>
+                        <td class="td-desktop food-weight"><input class="weight-input" type="number" value="${dict["weight"]}"></td>
+                        <td class="td-desktop food-kcal">${dict["kcal"]} kcal</td>
+                        <td class="td-desktop food-carbs">${dict["carbs"]} g</td>
+                        <td class="td-desktop food-fats">${dict["fats"]} g</td>
+                        <td class="td-desktop food-protein">${dict["proteins"]} g</td>
+                        <td class="td-desktop control-button"><button onClick="removeRow()">Remove</button></td>`   
+                    tbody.appendChild(tr)
+                    })
+                table.appendChild(tbody)
+                }
+            catch (error){
+                console.log(error)
+            }
+        }
+        else {
+            try {
+                let table = document.getElementsByTagName("table")[0]
+                let foods_data = JSON.parse(atob(q))
+                document.querySelector(".add").style.display = "block"
+                document.querySelector(".cancel").style.display = "block"
+                foods_data = await getNutrition(foods_data)
+                foods_data.forEach((dict) => {
+                    tbody = document.createElement("tbody")
+                    tbody.innerHTML = `
+                    <tr>
+                        <th class="th-mobile">Name</th>
+                        <td class="td-mobile food-name">${dict["name"]}</td>
+                    </tr>
+                    <tr>
+                        <th class="th-mobile">Weight (in grams)</th>
+                        <td class="td-mobile food-weight"><input class="weight-input" type="number" value="${dict["weight"]}"></td>
+                    </tr>
+                    <tr>
+                        <th class="th-mobile">Kcal</th>
+                        <td class="td-mobile food-kcal">${dict["kcal"]} kcal</td>
+                    </tr>
+                    <tr>
+                        <th class="th-mobile">Carbs</th>
+                        <td class="td-mobile food-carbs">${dict["carbs"]} g</td>
+                    </tr>
+                    <tr>
+                        <th class="th-mobile">Fats</th>
+                        <td class="td-mobile food-fats">${dict["fats"]} g</td>
+                    </tr>
+                    <tr>
+                        <th class="th-mobile">Proteins</th>
+                        <td class="td-mobile food-proteins">${dict["proteins"]} g</td>
+                    </tr>
+                    <tr>
+                        <th class="th-mobile"></th>
+                        <td class="td-mobile control-button"><button onClick="removeRow()">Remove</button></td>
+                    </tr>
+                    `
+                    table.appendChild(tbody)
+                    })
+                }
+            catch(error) {
+                console.log(error)
+            }
+        }
+        weight_inputs = document.getElementsByClassName('weight-input')
+        weight_inputs = [...weight_inputs]
+        weight_inputs.forEach((input) => {
+            input.addEventListener('input', function() {
+                onWeightChange(input)
+            })
+        })
+    }
+    
+    function onWeightChange(input) {
+        if (w > h) {
+            let fields = input.parentNode.parentNode.children
+            let name = fields[0].innerText
+            let weight = input.value
+            let nameWeightToNutrition = weightToNutrition[name]
+            let weightPerHundred = weight/100
+            let kcal = weightPerHundred * nameWeightToNutrition["kcal"]
+            fields[2].innerText = `${Math.round(kcal)} kcal`
+            let carbs = weightPerHundred * nameWeightToNutrition["carbs"]
+            fields[3].innerText = `${Math.round(carbs)} g`
+            let fats = weightPerHundred * nameWeightToNutrition["fats"]
+            fields[4].innerText = `${Math.round(fats)} g`
+            let proteins = weightPerHundred * nameWeightToNutrition["proteins"]
+            fields[5].innerText = `${Math.round(proteins)} g`
+        }
+        else {
+            let fields = input.parentNode.parentNode.parentNode.children
+            let name = fields[0].children[1].innerText      
+            let weight = input.value
+            let nameWeightToNutrition = weightToNutrition[name]
+            let weightPerHundred = weight/100
+            let kcal = weightPerHundred * nameWeightToNutrition["kcal"]
+            fields[2].children[1].innerText = `${Math.round(kcal)} kcal`
+            let carbs = weightPerHundred * nameWeightToNutrition["carbs"]
+            fields[3].children[1].innerText = `${Math.round(carbs)} g`
+            let fats = weightPerHundred * nameWeightToNutrition["fats"]
+            fields[4].children[1].innerText = `${Math.round(fats)} g`
+            let proteins = weightPerHundred * nameWeightToNutrition["proteins"]
+            fields[5].children[1].innerText = `${Math.round(proteins)} g`
+        }
+    }
+
+    function removeRow(){
+        let parent;
+        if (w > h) {
+            parent = event.srcElement.parentNode.parentNode
+        }
+        else {
+            parent = event.srcElement.parentNode.parentNode.parentNode
+        }
+        if (event.srcElement.innerHTML === "Remove") {
+            [...parent.children].forEach((child) => {
+                if (child.className != 'control-button') {
+                    child.style.opacity="0.2"
+                }
+            })
+            event.srcElement.innerHTML="Revert"
+        }
+        else {
+            [...parent.children].forEach((child) => {
+                if (child.className != 'control-button') {
+                    child.style.opacity="1"
+                }
+            })
+            event.srcElement.innerHTML="Remove"
+        }
+    }
+    async function addToDatabase(foods_data) {
+        foods_data = {
+            "food": foods_data,
+            "token": localStorage.getItem("token")
+        }
+        let api_url = APP_URL + "/api/products"
+        const response = await fetch(api_url, {
+        method: "POST",
+        body: JSON.stringify(foods_data),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8"
+          }
+        });
+
+        const response_json = await response.json()
+        console.log(response_json)
+    }
+    function addButton() {
+        let data = document.getElementsByTagName("td")
+        console.log(data)
+        data = [...data]
+        let foods_data = []
+        let food_data = []
+        data.forEach((td, index) => {
+            if ((index)%7 == 6 && td.children[0].innerHTML === "Remove") {
+                foods_data.push({
+                    "name": food_data[0],
+                    "weight": food_data[1],
+                    "kcal": food_data[2].replace(" kcal", ""),
+                    "carbs": food_data[3].replace(" g",""),
+                    "fats": food_data[4].replace(" g",""),
+                    "protein": food_data[5].replace(" g",""),
+                })
+                food_data = []
+            }
+            else if (index%7 == 1){
+                food_data.push(td.children[0].value)
+            }
+            else {
+                food_data.push(td.innerText)
+            }
+        })
+        if (foods_data.length > 0) {
+            addToDatabase(foods_data)
+        }
+        window.location.href = window.location.href.replace("/add", "/")
+    }
+    function cancelButton() {
+        window.location.href = window.location.href.replace("/add", "/")
+    }
+</script>
+</body>
+</html>

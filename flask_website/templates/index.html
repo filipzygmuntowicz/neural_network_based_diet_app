@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+    <title>Index</title>
+</head>
+{% include "header.html" %}
+<body>
+    <main>
+        <div class="date-container">
+            <img src = "{{ url_for('static', filename='left.svg') }}" onClick="previousDay()" class="arrow" width="50"/>
+            <h1></h1>
+            <img src = "{{ url_for('static', filename='right.svg') }}" onClick="nextDay()" class="arrow" width="50"/>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Food Item</th>
+                    <th>Weight</th>
+                    <th>Calories</th>
+                    <th>Carbohydrates</th>
+                    <th>Fats</th>
+                    <th>Proteins</th>
+                    
+                    <!-- Add more columns as needed (e.g., protein, fat, carbohydrates, etc.) -->
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </main>
+
+<script>
+    let w = window.innerWidth;
+    let h = window.innerHeight;
+    let currentDate = new Date()
+    let h1 = document.getElementsByTagName("h1")[0]
+    h1.innerText = currentDate.toDateString();
+    function previousDay() {
+        currentDate.setDate(currentDate.getDate() - 1);
+        h1.innerText = currentDate.toDateString();
+        getProducts()
+    }
+    function nextDay() {
+        currentDate.setDate(currentDate.getDate() + 1);
+        h1.innerText = currentDate.toDateString();
+        getProducts()
+    }
+    function f(){
+        let parent;
+        if (w > h) {
+            parent = event.srcElement.parentNode.parentNode
+        }
+        else {
+            parent = event.srcElement.parentNode.parentNode.parentNode
+        }
+        parent.remove()
+    }
+    async function getProducts() {
+        let previous_trs = document.getElementsByTagName("td")
+        previous_tds = [...previous_trs]
+        previous_tds.forEach((tr) => tr.remove())
+        let api_url = APP_URL + "/api/products?" + new URLSearchParams({
+            date: Date.parse(currentDate),
+        })
+        const response = await fetch(api_url, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`}
+        });
+        let data = await response.json()
+        data = data["data"]
+        let table = document.getElementsByTagName("table")[0]
+        data.forEach((product) => {
+            tr = document.createElement("tr")
+            tr.innerHTML = `
+                <td class="td-desktop food-name"><b>${product["name"]}</b></td>
+                <td class="td-desktop food-weight">${product["weight"]} g</td>
+                <td class="td-desktop food-kcal">${product["kcal"]} kcal</td>
+                <td class="td-desktop food-carbs">${product["carbs"]} g</td>
+                <td class="td-desktop food-fats">${product["fats"]} g</td>
+                <td class="td-desktop food-protein">${product["protein"]} g</td>`
+        table.appendChild(tr)
+        })
+    }
+    getProducts()
+</script>
+</body>
+</html>

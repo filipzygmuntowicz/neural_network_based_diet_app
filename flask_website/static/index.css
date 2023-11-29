@@ -1,0 +1,65 @@
+/* Reset some default styles */
+html, body, h1, h2, h3, p, table {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+h1 {
+    font-size: 1.5rem;
+}
+
+main {
+    margin: 20px;
+    padding-top: 20rem;
+}
+.date-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-left:38%;
+}
+table {
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+.food-name {
+    background-color: #3b3b3b;
+    color:white;
+}
+.arrow:hover {
+    cursor: pointer;    
+}
+th, td {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 12px;
+}
+
+th {
+    background-color: black;
+    color: #fff;
+}
+
+tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    table {
+        font-size: 0.9em;
+    }
+
+    th, td {
+        padding: 8px;
+    }
+}

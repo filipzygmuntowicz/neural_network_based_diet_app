@@ -1,0 +1,53 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='header.css') }}">
+<header>
+    <div class="header-container">
+        <nav class="header__nav">
+            <ul>
+                <li><a href="{{ url_for('index')}}"  class="nav__link">Home</a></li>
+                <li><a href="{{ url_for('add')}}" class="nav__link">Add</a></li>
+                <li><a href="{{ url_for('connect')}}" class="nav__link">Connect</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<script>
+    console.log("AA")
+    const APP_URL = "http://127.0.0.1:5000"
+    async function token() {
+    let api_url = APP_URL + "/api/get_token"
+    if (localStorage.getItem("token")) {
+        console.log("jest token")
+        
+    }
+    else {
+        const response = await fetch(api_url, {
+            method: "GET"
+        });
+        let response_json = await response.json()
+        console.log(response_json["token"]);
+        localStorage.setItem("token", response_json["token"]);
+    }}
+    token()
+    //if (localStorage.getItem("username")) {  
+    //    register = document.getElementsByClassName("nav__link")[2]
+    //    login = document.getElementsByClassName("nav__link")[3]
+    //    register.remove()
+    //    login.remove()
+    //    loggedAs = document.getElementsByClassName("logged-as")[0]
+    //    let text = document.createTextNode(`Logged in as: ${localStorage.getItem("username")}`);
+    //    loggedAs.appendChild(text);
+    //}
+    //else {
+    //    quiz = document.getElementsByClassName("nav__link")[1]
+    //    logout = document.getElementsByClassName("logout")[0]
+    //    logout.remove()
+    //    quiz.remove()
+    //}
+    //function logOut() {
+    //    localStorage.removeItem("username");
+    //    localStorage.removeItem("token");
+    //    const app_url = window.location.href.split('/')[2]
+    //    window.location.replace(`https://${app_url}/`)
+    //}
+</script>

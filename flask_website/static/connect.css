@@ -1,0 +1,21 @@
+/* Reset some default styles */
+html, body, h1, h2, h3, p, table {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+}
+.main-container {
+    padding-top: 10rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+img {
+    max-width: 20rem;
+    max-height: 20rem;
+}

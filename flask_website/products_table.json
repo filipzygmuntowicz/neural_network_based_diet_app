@@ -1,0 +1,45 @@
+[{
+    "name": "orange",
+    "density": 0.814,
+    "proportions": 1.133,
+    "kcal": 47,
+    "fats": 0.1,
+    "carbs": 12,
+    "proteins": 0.9
+},
+{
+    "name": "apple",
+    "density": 0.75,
+    "proportions": 1.298,
+    "kcal": 52,
+    "fats": 0.2,
+    "carbs": 14,
+    "proteins": 0.3
+},
+{
+    "name": "pepper",
+    "density": 0.92,
+    "proportions": 1.1333,
+    "kcal": 40,
+    "fats": 0.2,
+    "carbs": 9,
+    "proteins": 2
+},
+{
+    "name": "lemon",
+    "density": 0.953,
+    "proportions": 1.442,
+    "kcal": 28,
+    "fats": 0.3,
+    "carbs": 9,
+    "proteins": 1.1
+},
+{
+    "name": "onion",
+    "density": 1.526,
+    "proportions": 1.327,
+    "kcal": 39,
+    "fats": 0.1,
+    "carbs": 9,
+    "proteins": 1.1
+}]
